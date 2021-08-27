@@ -1,39 +1,17 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
-    <div id='cameraDemo'>
+    <div class='cameraSpace'>
+      <div id='cameraDemo'>
+      </div>
+      <canvas id="canvas"></canvas>
     </div>
-    <canvas id="canvas"></canvas>
-
     <button id='shutter' v-on:click='this.snapCamera()'>
       Cheese!
     </button>
+
+    <div id='appendField' @ocrTxt="$emit('ocrTxt', $event.target.value)">
+    </div>
   </div>
 </template>
 
@@ -49,7 +27,7 @@ export default {
   methods: {
     snapCamera: function() {
       const camera = document.getElementsByTagName('video')[0]
-      const canvas = document.querySelector('#canvas')
+      const canvas = document.querySelector('.drawingBuffer')
       document.querySelector('#shutter').addEventListener('click', () => {
         const ctx = canvas.getContext('2d');
 
@@ -59,8 +37,54 @@ export default {
         }, 500)
 
         ctx.drawImage(camera, 0, 0, canvas.width, canvas.height);
+
+        this.sendImage(canvas);
       });
     },
+    sendImage: function(canvas) {
+      //画像をBase64に変換する
+      var dataRaw = canvas.toDataURL("image/jpeg");
+      var dataArray = dataRaw.split( ',' );
+      var base64string = dataArray[ 1 ];
+      const appendField = document.querySelector('#appendField');
+      // const div_raw_matrial = document.getElementById("raw_matrial");
+
+      let body = {
+        requests: [
+          {image: {content: base64string}, features: [{type: 'TEXT_DETECTION'}]}
+        ]
+      };
+
+      const url = 'https://vision.googleapis.com/v1/images:annotate?key=AIzaSyD6zE1TyBncQGocEqknyy70oGUn7hmmxAY';
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onreadystatechange = () => {
+
+        const from_json = JSON.parse(xhr.responseText);
+        const analizedText = from_json.responses[0].fullTextAnnotation.text;
+
+        //---------------------------
+        //CoronaLab 仮の健康度を算出 API実行
+        const url2 = 'https://dev.lahmu-cdn-web.food-score.tech/api/v1/temporary_scores';
+        let xhr2 = new XMLHttpRequest();
+        xhr2.open('POST', url2, true );
+        xhr2.setRequestHeader('Content-Type', 'application/json');
+
+        let json = JSON.stringify({
+          raw_material: "",
+          raw_material_ocr_str: analizedText
+        });
+
+        xhr2.onreadystatechange = () => {
+          const from_json2 = JSON.parse(xhr2.responseText);
+          console.log(from_json2);
+          appendField.innerHTML = from_json2.raw_material_ocr_str;
+        };
+        xhr2.send( json );
+      };
+      xhr.send( JSON.stringify(body) );
+    }
   }
 }
 
@@ -68,6 +92,17 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.hello {
+  display: flex;
+  flex-direction: column;
+}
+.cameraSpace {
+  display: flex;
+  justify-content: center;
+}
+#shutter {
+  justify-content: center;
+}
 h3 {
   margin: 40px 0 0;
 }

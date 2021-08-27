@@ -18,7 +18,6 @@ export default {
 
     this.startCamera()
     this.loadCamera(camera)
-    // this.snapCamera(camera, canvas)
   },
   methods: {
     startCamera: function() {
@@ -64,19 +63,6 @@ export default {
         })).catch(((err)=>{ console.log(err) }))
 
     },
-    snapCamera: function(camera, canvas) {
-
-      document.querySelector('#shutter').addEventListener('click', () => {
-        const ctx = canvas.getContext('2d');
-
-        camera.pause();
-        setTimeout(() => {
-          camera.play();
-        }, 500)
-
-        ctx.drawImage(camera, 0, 0, canvas.width, canvas.height);
-      });
-    }
   }
 }
 </script>
