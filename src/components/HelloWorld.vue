@@ -12,6 +12,8 @@
 
     <div id='appendField' @ocrTxt="$emit('ocrTxt', $event.target.value)">
     </div>
+    <div id='barcodeField'>
+    </div>
   </div>
 </template>
 
@@ -19,7 +21,8 @@
 export default {
   name: 'HelloWorld',
   props: {
-    msg: String
+    msg: String,
+    barcode: String
   },
   mounted: function() {
 
@@ -84,7 +87,7 @@ export default {
         xhr2.send( json );
       };
       xhr.send( JSON.stringify(body) );
-    }
+    },
   }
 }
 

@@ -1,6 +1,8 @@
+/* eslint-disable vue/no-mutating-props */
+/* eslint-disable vue/no-mutating-props */
 <template>
   <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <HelloWorld msg="Welcome to Your Vue.js App" />
 </template>
 
 <script>
@@ -14,7 +16,6 @@ export default {
   },
   mounted: function() {
     const camera = document.querySelector('#cameraDemo');
-    // const canvas = document.querySelector('#picture');
 
     this.startCamera()
     this.loadCamera(camera)
@@ -43,6 +44,8 @@ export default {
         console.log(result.codeResult);
         if (result.codeResult) {
           console.log(result.codeResult.code);
+          var test = document.querySelector('#barcodeField');
+          test.innerHTML = result.codeResult.code;
         }
       });
     },
