@@ -29,12 +29,11 @@
     </ul>
     <div id='cameraDemo'>
     </div>
-    <canvas id="picture"></canvas>
-    <form>
-      <button id='shutter'>
-        Cheese!
-      </button>
-    </form>
+    <canvas id="canvas"></canvas>
+
+    <button id='shutter' v-on:click='this.snapCamera()'>
+      Cheese!
+    </button>
   </div>
 </template>
 
@@ -45,9 +44,23 @@ export default {
     msg: String
   },
   mounted: function() {
+
   },
   methods: {
+    snapCamera: function() {
+      const camera = document.getElementsByTagName('video')[0]
+      const canvas = document.querySelector('#canvas')
+      document.querySelector('#shutter').addEventListener('click', () => {
+        const ctx = canvas.getContext('2d');
 
+        camera.pause();
+        setTimeout(() => {
+          camera.play();
+        }, 500)
+
+        ctx.drawImage(camera, 0, 0, canvas.width, canvas.height);
+      });
+    },
   }
 }
 
