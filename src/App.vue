@@ -14,6 +14,7 @@ export default {
   },
   mounted: function() {
     this.startCamera()
+    this.loadCamera()
   },
   methods: {
     startCamera: function() {
@@ -41,6 +42,35 @@ export default {
           console.log(result.codeResult.code);
         }
       });
+    },
+    loadCamera: function() {
+      const camera = document.querySelector('#cameraDemo');
+      const canvas = document.querySelector('#picture');
+      document.querySelector('#shutter').addEventListener('click', function(){
+        const ctx = canvas.getContext('2d');
+
+        camera.pause();
+        setTimeout(() => {
+          camera.play();
+        }, 500)
+
+        ctx.drawImage(camera, 0, 0, canvas.width, canvas.height);
+      });
+
+      const constrains = {
+        audio: false,
+        video: {
+          width: 200,
+          height: 350,
+          facingMode: 'user'
+        // facingMode: { exact: "environment" }  // リアカメラを利用する場合
+        }
+      }
+      navigator.mediaDevices.getUserMedia(constrains)
+        .then(((stream)=>{
+          camera.srcObject = stream;
+          onloadedmetadata = () => { camera.play };
+        })).catch(((err)=>{ console.log(err) }))
     }
   }
 }

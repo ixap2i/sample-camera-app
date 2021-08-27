@@ -28,8 +28,13 @@
       <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
     </ul>
     <div id='cameraDemo'>
-
     </div>
+    <canvas id="picture"></canvas>
+    <form>
+      <button id='shutter'>
+        Cheese!
+      </button>
+    </form>
   </div>
 </template>
 
@@ -38,8 +43,14 @@ export default {
   name: 'HelloWorld',
   props: {
     msg: String
+  },
+  mounted: function() {
+  },
+  methods: {
+
   }
 }
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
