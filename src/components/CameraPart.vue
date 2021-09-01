@@ -1,13 +1,18 @@
 <template>
   <div>
     <div class='cameraSpace'>
-      <button id='shutter' v-on:click='this.snapCamera()'>
-        Cheese!
-      </button>
+      <div class='buttonGroup'>
+        <button id='shutter' v-on:click='this.snapCamera()'>
+          Cheese!
+        </button>
+        <button v-on:click='this.refreshPage()'>
+          Refresh
+        </button>
+      </div>
+
       <div id='cameraDemo'>
       </div>
       <canvas id="canvas"></canvas>
-
     </div>
 
     <div id='appendField' @ocrTxt="$emit('ocrTxt', $event.target.value)">
@@ -115,6 +120,9 @@ export default {
     },
     setImage: function() {
       // this.targetSplite = from_json2.raw_material_ocr_str;
+    },
+    refreshPage: function() {
+      location.reload();
     }
   }
 }
@@ -123,9 +131,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.hello {
-  /* display: flex;
-  flex-direction: column; */
+.buttonGroup {
+  display: flex;
+  justify-content: space-evenly;
 }
 .cameraSpace {
   display: flex;
