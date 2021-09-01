@@ -29,10 +29,6 @@
         </div>
       </div>
     </div>
-
-    <div id='appendField' @ocrTxt="$emit('ocrTxt', $event.target.value)">
-    </div>
-
   </div>
 </template>
 
@@ -40,9 +36,6 @@
 export default {
   name: 'CameraPart',
   computed: {
-    targetSplite: function() {
-      return document.querySelector('#appendField');
-    },
     healthRank: function() {
       return document.querySelector('#healthRank');
     },
@@ -73,9 +66,7 @@ export default {
       default: function() {
         return ['Content-Type', 'application/json'];
       }
-
     }
-
   },
   mounted: function() {
 
@@ -83,20 +74,18 @@ export default {
   methods: {
     snapCamera: function() {
       const camera = document.getElementsByTagName('video')[0]
-      // const canvas = document.querySelector('.drawingBuffer')
       const canvas = document.querySelector('#canvas')
-      document.querySelector('#shutter').addEventListener('click', () => {
-        const ctx = canvas.getContext('2d');
 
-        camera.pause();
-        setTimeout(() => {
-          camera.play();
-        }, 500)
+      const ctx = canvas.getContext('2d');
 
-        ctx.drawImage(camera, 0, 0, canvas.width, canvas.height);
+      camera.pause();
+      setTimeout(() => {
+        camera.play();
+      }, 500)
 
-        this.sendImage(canvas);
-      });
+      ctx.drawImage(camera, 0, 0, canvas.width, canvas.height);
+
+      this.sendImage(canvas);
     },
     sendImage: function(canvas) {
       //画像をBase64に変換する
@@ -133,10 +122,10 @@ export default {
 
           console.log(from_json2);
 
-          this.targetSplite.innerHTML = from_json2.raw_material_ocr_str;
           this.additiveSubstances.innerHTML = from_json2.additive_substances;
           this.healthRank.innerHTML = from_json2.health_rank;
           this.healthScore.innerHTML = from_json2.health_score;
+          this.rawMaterialOCR.innerHTML = from_json2.raw_material_ocr_str;
         };
         xhr2.send( json );
       };
@@ -147,9 +136,6 @@ export default {
       var dataArray = dataRaw.split( ',' );
       var base64string = dataArray[ 1 ];
       return base64string;
-    },
-    setImage: function() {
-      // this.targetSplite = from_json2.raw_material_ocr_str;
     },
     refreshPage: function() {
       location.reload();
