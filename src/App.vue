@@ -1,21 +1,25 @@
 /* eslint-disable vue/no-mutating-props */
 /* eslint-disable vue/no-mutating-props */
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  {{this.barcodeTxt}}
-  {{this.event}}
-  <HelloWorld v-on:event="this.barcode = this.barcodeTxt" />
-  <!-- <HelloWorld v-bind:barcode="this.barcodeTxt" /> -->
+  <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
+  <div id='barcodeField'>
+    <h1>読み取られたバーコード: {{ barcode }}</h1>
+  </div>
+  <description-part></description-part>
+  <CameraPart />
+  <!-- <CameraPart v-on:event="this.barcode = this.barcodeTxt" /> -->
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import CameraPart from './components/CameraPart.vue'
 import Quagga from 'quagga';
+import DescriptionPart from './components/DescriptionPart.vue';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    CameraPart,
+    DescriptionPart
   },
   data: function() {
     return {
@@ -133,7 +137,6 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
   margin-top: 60px;
 }

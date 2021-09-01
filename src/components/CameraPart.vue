@@ -1,8 +1,5 @@
 <template>
-  <div class="hello">
-    <div id='barcodeField'>
-      <h1>読み取られたバーコード: {{ barcode }}</h1>
-    </div>
+  <div>
     <div class='cameraSpace'>
       <button id='shutter' v-on:click='this.snapCamera()'>
         Cheese!
@@ -21,7 +18,7 @@
 
 <script>
 export default {
-  name: 'HelloWorld',
+  name: 'CameraPart',
   computed: {
     targetSplite: function() {
       return document.querySelector('#appendField');
@@ -132,9 +129,6 @@ export default {
 }
 .cameraSpace {
   display: flex;
-  justify-content: center;
-}
-#shutter {
   justify-content: center;
 }
 #canvas {
