@@ -2,7 +2,10 @@
 /* eslint-disable vue/no-mutating-props */
 <template>
   <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App" />
+  {{this.barcodeTxt}}
+  {{this.event}}
+  <HelloWorld v-on:event="this.barcode = this.barcodeTxt" />
+  <!-- <HelloWorld v-bind:barcode="this.barcodeTxt" /> -->
 </template>
 
 <script>
@@ -13,6 +16,27 @@ export default {
   name: 'App',
   components: {
     HelloWorld
+  },
+  data: function() {
+    return {
+      barcodeTxt: 'test',
+    };
+  },
+  computed: {
+    targetArea: function() {
+      return document.querySelector('#barcodeField').innerHTML;
+    }
+  },
+  props: {
+    barcodeEvent: {
+      type: Function
+    }
+  },
+  watch: {
+    barcodeWatcher: function(eve) {
+      this.barcodeTxt = eve;
+      console.log(eve);
+    }
   },
   mounted: function() {
     const camera = document.querySelector('#cameraDemo');
@@ -40,14 +64,44 @@ export default {
         console.log('Initialize was completed.');
         Quagga.start();
       })
+
+
+      Quagga.onProcessed(function(result) {
+        var drawingCtx = Quagga.canvas.ctx.overlay,
+        drawingCanvas = Quagga.canvas.dom.overlay;
+
+        if (result) {
+          if (result.boxes) {
+              drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
+              result.boxes.filter(function (box) {
+                  return box !== result.box;
+              }).forEach(function (box) {
+                  Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 2});
+              });
+          }
+
+          if (result.box) {
+              Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {color: "#00F", lineWidth: 2});
+          }
+
+          if (result.codeResult && result.codeResult.code) {
+              Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
+          }
+        }
+      });
+
       Quagga.onDetected(function(result) {
         console.log(result.codeResult);
         if (result.codeResult) {
           console.log(result.codeResult.code);
           var test = document.querySelector('#barcodeField');
-          test.innerHTML = result.codeResult.code;
+          this.barcodeTxt = result.codeResult.code;
+          this.barcodeWatcher = result.codeResult.code;
+          test.innerHTML = `<h1>読み取られたコード: ${result.codeResult.code}</h1>`;
         }
       });
+
+
     },
     loadCamera: function(camera) {
 
@@ -66,6 +120,10 @@ export default {
         })).catch(((err)=>{ console.log(err) }))
 
     },
+    setUpBarcode(text) {
+      // this.barcodeEvent(text);
+      this.$emit('barcode', text);
+    }
   }
 }
 </script>
@@ -78,5 +136,18 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+#cameraDemo > video {
+  position: relative;
+}
+.drawingBuffer {
+  position: absolute;
+  margin-left: -639px;
+}
+@media screen and (max-width: 480px) {
+  .drawingBuffer {
+    margin-top: -480px;
+    margin-left: -193px;
+  }
 }
 </style>
