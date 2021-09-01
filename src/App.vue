@@ -7,6 +7,7 @@
   </div>
   <description-part></description-part>
   <CameraPart />
+  <HealthScorePart />
   <!-- <CameraPart v-on:event="this.barcode = this.barcodeTxt" /> -->
 </template>
 
@@ -127,6 +128,9 @@ export default {
     setUpBarcode(text) {
       // this.barcodeEvent(text);
       this.$emit('barcode', text);
+    },
+    resizeToCameraWidth: function() {
+
     }
   }
 }
@@ -142,15 +146,24 @@ export default {
 }
 #cameraDemo > video {
   position: relative;
+  width: 320px;
+  height: 220px;
 }
 .drawingBuffer {
   position: absolute;
-  margin-left: -639px;
+  margin-left: -320px;
+  width: 320px;
+  height: 220px;
+}
+#canvas {
+  border: solid black 1px;
+  width: 320px;
+  height: 220px;
 }
 @media screen and (max-width: 480px) {
   .drawingBuffer {
-    margin-top: -480px;
-    margin-left: -193px;
+    /* margin-top: -220px; */
+    /* margin-left: -220px; */
   }
 }
 </style>

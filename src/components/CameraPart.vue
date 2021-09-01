@@ -139,11 +139,6 @@ export default {
   display: flex;
   justify-content: center;
 }
-#canvas {
-  width: 640px;
-  /* height: 480px; */
-  border: solid black 1px;
-}
 h3 {
   margin: 40px 0 0;
 }
