@@ -2,10 +2,10 @@
   <div>
     <div class='cameraSpace'>
       <div class='buttonGroup'>
-        <button id='shutter' v-on:click='this.snapCamera()'>
+        <button type="button" class="btn btn-default" id='shutter' v-on:click='this.snapCamera()'>
           Cheese!
         </button>
-        <button v-on:click='this.refreshPage()'>
+        <button type="button" class="btn btn-default" v-on:click='this.refreshPage()'>
           Refresh
         </button>
       </div>
@@ -13,6 +13,21 @@
       <div id='cameraDemo'>
       </div>
       <canvas id="canvas"></canvas>
+
+      <div class="card" style="width: 20rem;">
+        <div class="card-body">
+          <h4 class="card-title">健康ランク: <span id='healthRank'></span></h4>
+          <h4 class="card-title">健康度: <span id='healthScore'></span></h4>
+          <div class="card-text">
+            <h4 class="card-title">原材料名:</h4>
+            <span id='rawMaterialOCR'></span>
+          </div>
+          <div class="card-text">
+            <h4 class="card-title">添加物:</h4>
+            <span id='additiveSubstances'></span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div id='appendField' @ocrTxt="$emit('ocrTxt', $event.target.value)">
@@ -27,6 +42,18 @@ export default {
   computed: {
     targetSplite: function() {
       return document.querySelector('#appendField');
+    },
+    healthRank: function() {
+      return document.querySelector('#healthRank');
+    },
+    healthScore: function() {
+      return document.querySelector('#healthScore');
+    },
+    additiveSubstances: function() {
+      return document.querySelector('#additiveSubstances');
+    },
+    rawMaterialOCR: function() {
+      return document.querySelector('#rawMaterialOCR');
     },
     pasteImage: function() {
       return 'test';
@@ -107,6 +134,9 @@ export default {
           console.log(from_json2);
 
           this.targetSplite.innerHTML = from_json2.raw_material_ocr_str;
+          this.additiveSubstances.innerHTML = from_json2.additive_substances;
+          this.healthRank.innerHTML = from_json2.health_rank;
+          this.healthScore.innerHTML = from_json2.health_score;
         };
         xhr2.send( json );
       };
@@ -134,6 +164,7 @@ export default {
 .buttonGroup {
   display: flex;
   justify-content: space-evenly;
+  margin: 1.33em 0;
 }
 .cameraSpace {
   display: flex;
