@@ -13,21 +13,6 @@
       <div id='cameraDemo'>
       </div>
       <canvas id="canvas"></canvas>
-
-      <div class="card" style="width: 20rem;">
-        <div class="card-body">
-          <h4 class="card-title">健康ランク: <span id='healthRank'></span></h4>
-          <h4 class="card-title">健康度: <span id='healthScore'></span></h4>
-          <div class="card-text">
-            <h4 class="card-title">原材料名:</h4>
-            <span id='rawMaterialOCR'></span>
-          </div>
-          <div class="card-text">
-            <h4 class="card-title">添加物:</h4>
-            <span id='additiveSubstances'></span>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -122,10 +107,8 @@ export default {
 
           console.log(from_json2);
 
-          this.additiveSubstances.innerHTML = from_json2.additive_substances;
-          this.healthRank.innerHTML = from_json2.health_rank;
-          this.healthScore.innerHTML = from_json2.health_score;
-          this.rawMaterialOCR.innerHTML = from_json2.raw_material_ocr_str;
+          this.response = from_json2;
+          this.$emit('response', from_json2);
         };
         xhr2.send( json );
       };

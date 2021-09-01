@@ -6,13 +6,13 @@
     <h1>読み取られたバーコード: {{ barcode }}</h1>
   </div>
   <description-part></description-part>
-  <CameraPart />
-  <HealthScorePart />
-  <!-- <CameraPart v-on:event="this.barcode = this.barcodeTxt" /> -->
+  <CameraPart @response='getResponse' />
+  <HealthScorePart v-bind:healthData="this.responseObj" />
 </template>
 
 <script>
 import CameraPart from './components/CameraPart.vue'
+import HealthScorePart from './components/HealthScorePart.vue'
 import Quagga from 'quagga';
 import DescriptionPart from './components/DescriptionPart.vue';
 
@@ -20,11 +20,13 @@ export default {
   name: 'App',
   components: {
     CameraPart,
-    DescriptionPart
+    DescriptionPart,
+    HealthScorePart
   },
   data: function() {
     return {
       barcodeTxt: 'test',
+      responseObj: ''
     };
   },
   computed: {
@@ -131,6 +133,9 @@ export default {
     },
     resizeToCameraWidth: function() {
 
+    },
+    getResponse: function(response) {
+      this.responseObj = response;
     }
   }
 }
