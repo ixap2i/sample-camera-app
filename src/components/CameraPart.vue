@@ -10,8 +10,9 @@
         </button>
       </div>
 
-      <div id='cameraDemo'>
-      </div>
+      <div id='cameraDemo'></div>
+      <video id='video' autoplay muted playsinline></video>
+
       <canvas id="canvas"></canvas>
     </div>
   </div>
@@ -20,30 +21,19 @@
 <script>
 export default {
   name: 'CameraPart',
-  computed: {
-    healthRank: function() {
-      return document.querySelector('#healthRank');
-    },
-    healthScore: function() {
-      return document.querySelector('#healthScore');
-    },
-    additiveSubstances: function() {
-      return document.querySelector('#additiveSubstances');
-    },
-    rawMaterialOCR: function() {
-      return document.querySelector('#rawMaterialOCR');
-    },
-    pasteImage: function() {
-      return 'test';
-    },
-  },
   props: {
     msg: String,
     barcode: String,
-    url: {
+    cloudVisionUrl: {
       type: String,
       default: function() {
         return 'https://vision.googleapis.com/v1/images:annotate?key=AIzaSyD6zE1TyBncQGocEqknyy70oGUn7hmmxAY';
+      }
+    },
+    coronaLabUrl: {
+      type: String,
+      default: function() {
+        return 'https://dev.lahmu-cdn-web.food-score.tech/api/v1/temporary_scores';
       }
     },
     headers: {
@@ -51,31 +41,33 @@ export default {
       default: function() {
         return ['Content-Type', 'application/json'];
       }
-    }
+    },
+    loadedFlag: Boolean
   },
   mounted: function() {
-
   },
   methods: {
     snapCamera: function() {
-      const camera = document.getElementsByTagName('video')[0]
-      const canvas = document.querySelector('#canvas')
+      console.log(this.loadedFlag);
+      if(this.loadedFlag) {
+        const camera = document.getElementsByTagName('video')[0]
+        const canvas = document.querySelector('#canvas')
 
-      const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d');
 
-      camera.pause();
-      setTimeout(() => {
-        camera.play();
-      }, 500)
+        camera.pause();
+        setTimeout(() => {
+          camera.play();
+        }, 500)
 
-      ctx.drawImage(camera, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(camera, 0, 0, canvas.width, canvas.height);
 
-      this.sendImage(canvas);
+        this.sendImage(canvas);
+      }
     },
     sendImage: function(canvas) {
       //画像をBase64に変換する
       var sendImage = this.pasteSnappedImage(canvas);
-      // const appendField = document.querySelector('#appendField');
 
       let body = {
         requests: [
@@ -83,19 +75,34 @@ export default {
         ]
       };
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', this.url, true);
+      xhr.open('POST', this.cloudVisionUrl, true);
 
       xhr.onreadystatechange = () => {
 
         const from_json = JSON.parse(xhr.responseText);
-        const analizedText = from_json.responses[0].fullTextAnnotation.text;
+        const analizedText = from_json.responses[0].fullTextAnnotation.text ? from_json.responses[0].fullTextAnnotation.text : '';
 
+        if (analizedText == '') {
+          // 例外処理orエラーメッセージ
+          // this.response = {
+          //   additive_substances: []
+          //   created_at: "2021-09-02T19:31:05.057+09:00"
+          //   health_rank: "A"
+          //   health_score: 80
+          //   id: 8893
+          //   raw_material: ""
+          //   raw_material_ocr_str: "(純幹は\n"
+          //   tagged_raw_material_str: "(純幹は"
+          //   updated_at: "2021-09-02T19:31:05.057+09:00"
+          // };
+          // this.$emit('response', from_json2);
+          return;
+        }
         //---------------------------
         //CoronaLab 仮の健康度を算出 API実行
-        const url2 = 'https://dev.lahmu-cdn-web.food-score.tech/api/v1/temporary_scores';
         let xhr2 = new XMLHttpRequest();
-        xhr2.open('POST', url2, true );
-        xhr2.setRequestHeader('Content-Type', 'application/json');
+        xhr2.open('POST', this.coronaLabUrl, true);
+        xhr2.setRequestHeader(...this.headers);
 
         let json = JSON.stringify({
           raw_material: "",

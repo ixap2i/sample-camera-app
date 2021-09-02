@@ -32,9 +32,7 @@ export default {
       default: function() {
         return ['Content-Type', 'application/json'];
       }
-
     }
-
   },
   mounted: function() {
   },

@@ -1,13 +1,10 @@
-/* eslint-disable vue/no-mutating-props */
-/* eslint-disable vue/no-mutating-props */
 <template>
-  <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
   <div id='barcodeField'>
     <h1>読み取られたバーコード: {{ barcode }}</h1>
   </div>
   <description-part></description-part>
-  <CameraPart @response='getResponse' />
-  <HealthScorePart v-bind:healthData="this.responseObj" />
+  <CameraPart @response='getResponse' v-bind:loadedFlag='this.loaded' />
+  <HealthScorePart v-bind:healthData='this.responseObj' />
 </template>
 
 <script>
@@ -25,31 +22,47 @@ export default {
   },
   data: function() {
     return {
-      barcodeTxt: 'test',
-      responseObj: ''
+      responseObj: '',
+      // cameraWidth: 640,
+      cameraWidth: 320,
+      // cameraHeight: 480,
+      cameraHeight: 220,
+      constrains: {
+        decodeBarCodeRate: 3,
+        successTimeout: 500,
+        codeRepetition: true,
+        tryVertical: true,
+        frameRate: 15,
+        width: this.cameraWidth,
+        height: this.cameraHeight,
+        facingMode: "environment"
+      },
+      loadCameraConstrains: {
+        audio: false,
+        // video: true
+          video: {
+            // width: 640,
+            width: 320,
+            // height: 480,
+            height: 220,
+          }
+      },
+      loaded: false
     };
   },
   computed: {
-    targetArea: function() {
-      return document.querySelector('#barcodeField').innerHTML;
-    }
-  },
-  props: {
-    barcodeEvent: {
-      type: Function
+    video: function() {
+      return document.querySelector('#cameraDemo');
     }
   },
   watch: {
     barcodeWatcher: function(eve) {
-      this.barcodeTxt = eve;
       console.log(eve);
     }
   },
   mounted: function() {
-    const camera = document.querySelector('#cameraDemo');
-
-    this.startCamera()
-    this.loadCamera(camera)
+    this.startCamera();
+    this.loadCamera();
   },
   methods: {
     startCamera: function() {
@@ -57,7 +70,8 @@ export default {
         inputStream: {
           name: 'Live',
           type: 'LiveStream',
-          target: document.querySelector('#cameraDemo')
+          target: this.video,
+          constrains: this.constrains
         },
         decoder: {
           readers: ['ean_reader']
@@ -72,27 +86,26 @@ export default {
         Quagga.start();
       })
 
-
       Quagga.onProcessed(function(result) {
         var drawingCtx = Quagga.canvas.ctx.overlay,
         drawingCanvas = Quagga.canvas.dom.overlay;
 
         if (result) {
           if (result.boxes) {
-              drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
-              result.boxes.filter(function (box) {
-                  return box !== result.box;
-              }).forEach(function (box) {
-                  Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 2});
-              });
+            drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
+            result.boxes.filter(function (box) {
+                return box !== result.box;
+            }).forEach(function (box) {
+                Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 2});
+            });
           }
 
           if (result.box) {
-              Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {color: "#00F", lineWidth: 2});
+            Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {color: "#00F", lineWidth: 2});
           }
 
           if (result.codeResult && result.codeResult.code) {
-              Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
+            Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
           }
         }
       });
@@ -101,38 +114,23 @@ export default {
         console.log(result.codeResult);
         if (result.codeResult) {
           console.log(result.codeResult.code);
-          var test = document.querySelector('#barcodeField');
-          this.barcodeTxt = result.codeResult.code;
-          this.barcodeWatcher = result.codeResult.code;
-          test.innerHTML = `<h1>読み取られたコード: ${result.codeResult.code}</h1>`;
+          var barcodeFiled = document.querySelector('#barcodeField');
+          barcodeFiled.innerHTML = `<h1>読み取られたコード: ${result.codeResult.code}</h1>`;
         }
       });
 
-
     },
-    loadCamera: function(camera) {
-
-      const constrains = {
-        audio: false,
-        video: {
-          width: 300,
-          height: 200,
-          // facingMode: { exact: "environment" }  // リアカメラを利用する場合
-        }
-      }
-      navigator.mediaDevices.getUserMedia(constrains)
+    loadCamera: function() {
+      let camera = document.getElementsByTagName('video')[0];
+      navigator.mediaDevices.getUserMedia(this.loadCameraConstrains)
         .then(((stream)=>{
           camera.srcObject = stream;
           onloadedmetadata = () => { camera.play };
         })).catch(((err)=>{ console.log(err) }))
-
-    },
-    setUpBarcode(text) {
-      // this.barcodeEvent(text);
-      this.$emit('barcode', text);
+      this.loaded = true;
+      console.log(this.loaded);
     },
     resizeToCameraWidth: function() {
-
     },
     getResponse: function(response) {
       this.responseObj = response;
@@ -151,24 +149,28 @@ export default {
 }
 #cameraDemo > video {
   position: relative;
+  /* width: 640px; */
   width: 320px;
-  height: 220px;
+  /* height: 480px; */
+  height: 240px;
 }
 .drawingBuffer {
   position: absolute;
   margin-left: -320px;
+  /* width: 640px; */
   width: 320px;
-  height: 220px;
+  /* height: 480px; */
+  height: 240px;
 }
 #canvas {
   border: solid black 1px;
-  width: 320px;
-  height: 220px;
+  /* width: 640px; */
+  /* width: 320px; */
+  /* height: 480px; */
+  /* height: 240px; */
 }
 @media screen and (max-width: 480px) {
   .drawingBuffer {
-    /* margin-top: -220px; */
-    /* margin-left: -220px; */
   }
 }
 </style>
