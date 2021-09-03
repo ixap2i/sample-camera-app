@@ -140,7 +140,7 @@ export default {
       document.cookie = encodeURIComponent("test-id;domain=.netlify.app")+'='+encodeURIComponent("test")
 
       document.cookie = encodeURIComponent("user=John; domain=.netlify.app")
-      document.cookie = "user2=John; domain=.netlify.app"
+      document.cookie = "user2=John; domain=netlify.app"
       // document.cookie["test-id;domain=frosty-bartik-7a6050.netlify.app"] = 'test-id';
     }
   }
