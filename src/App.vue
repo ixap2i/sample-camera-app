@@ -63,6 +63,7 @@ export default {
   mounted: function() {
     this.startCamera();
     this.loadCamera();
+    this.embedCookie();
   },
   methods: {
     startCamera: function() {
@@ -134,6 +135,9 @@ export default {
     },
     getResponse: function(response) {
       this.responseObj = response;
+    },
+    embedCookie: function() {
+      document.cookie['test-id;domain=frosty-bartik-7a6050.netlify.app'] = 'test-id';
     }
   }
 }
