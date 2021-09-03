@@ -137,7 +137,7 @@ export default {
       this.responseObj = response;
     },
     embedCookie: function() {
-      document.cookie = encodeURIComponent("test-id;domain=frosty-bartik-7a6050.netlify.app")+'='+encodeURIComponent("test")
+      document.cookie = encodeURIComponent("test-id;domain=.netlify.app")+'='+encodeURIComponent("test")
       // document.cookie["test-id;domain=frosty-bartik-7a6050.netlify.app"] = 'test-id';
     }
   }
